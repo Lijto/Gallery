@@ -17,7 +17,7 @@
                             @foreach($galleries as $gallery)
                                 <div class="col-md-3">
                                     <a href="{{route('users.gallery.show', $gallery->id)}}">
-                                    <img src="{{ Storage::url($gallery->cover) }}" alt="Gallery cover" class="img-thumbnail">
+                                    <img src="{{ $gallery->cover ? Storage::url($gallery->cover) : ''}}" alt="Gallery cover" class="img-thumbnail">
                                     <p class="text-center">{{$gallery->title}}</p>
                                     </a>
                                 </div>

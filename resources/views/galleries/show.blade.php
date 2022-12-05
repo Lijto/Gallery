@@ -13,11 +13,17 @@
             <div class="card">
                 <div class="card-header">{{$gallery->title}}</div>
                 <div class="card-body justify-content-center">
-                    <img src="{{ Storage::url($gallery->cover) }}" alt="cover" class="img-thumbnail">
+                    <img src="{{ $gallery->cover ? Storage::url($gallery->cover) : '' }}" alt="cover"
+                         class="img-thumbnail">
                     <br><br>
-                    <a href="{{ route('users.gallery.edit', $gallery->id) }}" class="btn btn-success d-block">Edit gallery</a>
+                    <a href="{{ route('users.gallery.edit', $gallery) }}" class="btn btn-success d-block">Edit
+                        gallery</a>
                     <br>
-                    <a href="{{ route('users.gallery.destroy', $gallery->id) }}" class="btn btn-danger d-block">Delete gallery</a>
+                    <form action="{{route('users.gallery.destroy', $gallery)}}" method="post">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger btn-block">Delete gallery</button>
+                    </form>
                 </div>
             </div>
         </div>

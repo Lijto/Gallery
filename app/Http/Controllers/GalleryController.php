@@ -4,7 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreGalleryRequest;
 use App\Models\Gallery;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class GalleryController extends Controller
 {
@@ -27,20 +28,33 @@ class GalleryController extends Controller
 
     public function show($id)
     {
-        $gallery = Gallery::findOrFail($id);
+        $gallery = Gallery::query()->where('user_id', Auth::id())->findOrFail($id);
         return view('galleries.show', compact('gallery'));
     }
 
     public function edit($id)
     {
+        $gallery = Gallery::query()->where('user_id', Auth::id())->findOrFail($id);
+        return view('galleries.edit', compact('gallery'));
     }
 
-    public function update(Request $request, $id)
+    public function update(Gallery $gallery, StoreGalleryRequest $request)
     {
+        if (Auth::id() === $gallery->user_id) {
+            $gallery = $gallery->saveFromRequest($request);
+            return redirect(route('users.gallery.edit', $gallery));
+        }
+        return back()->withErrors(['error' => 'You don\'t have permissions for editing']);
     }
 
-    public function destroy($id)
+    public function destroy(Gallery $gallery)
     {
-        Gallery::where('user_id', \Auth::user()?->id)->findOrFail($id)->delete();
+        if (Auth::id() === $gallery->user_id) {
+            $cover = $gallery->cover;
+            $gallery->delete();
+            Storage::delete($cover);
+            return redirect(route('home'));
+        }
+        return back()->withErrors(['error' => 'You don\'t have permissions for deleting']);
     }
 }
